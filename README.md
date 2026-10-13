@@ -1,33 +1,64 @@
-# React + TypeScript + Vite
+# Smart Pest Tracking Dashboard (Proof of Concept)
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Ein interaktives Web-Dashboard zur Visualisierung und Auswertung von KI-gestuetztem Schaedlings- und Verhaltens-Tracking. Dieses Projekt dient als Proof of Concept (PoC) fuer eine vollstaendige End-to-End-Pipeline von der OpenCV-Videoanalyse bis zum cloudbasierten Reporting.
 
-Currently, two official plugins are available:
+**Live Demo:** [mouse-activity-dashboard.vercel.app](https://mouse-activity-dashboard.vercel.app/)  
+**Computer-Vision Pipeline:** Liegt direkt im Repository unter [`cv/tracker.py`](./cv/tracker.py)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+---
 
-## React Compiler
+## Konzept & Architektur
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Das System automatisiert die Erkennung, Zonenauswertung und Praeferenzanalyse:
 
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```text
+[Kamera / Videomaterial]
+       |
+[cv/tracker.py (OpenCV)] -> Erkennt Bewegung, Zonenaufenthalt & Koederkontakt
+       |
+       |--> 1. Schreibt Events & Metriken in Supabase Database (PostgreSQL)
+       |--> 2. Generiert & laedt Heatmap + Video in Supabase Storage
+                                       |
+                         [React Dashboard auf Vercel]
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
-# mouse-activity-dashboard
+---
+
+## Dashboard-Features
+
+- **KPI-Uebersicht:** Gesamtsichtungen, durchschnittliche Verweildauer, Koeder-Interaktionsrate und automatisch errechnete Peak-Aktivitaetszeit.
+- **Zonen- & Praeferenzanalyse:**
+  - Aufenthaltsdauer nach Zonen (_Mauseloch vs. Koederzone_) als Balkendiagramm.
+  - A/B-Test-Praeferenz (_Koeder A vs. Koeder B_) als Donut-Chart.
+- **Synchrone Medienansicht:** Parallele Anzeige des analysierten Videoclips und der generierten Aktivitaets-Heatmap.
+- **Ereignis-Protokoll:** Filterbare Historie aller Einzelsichtungen mit Verweildauer und Interaktionsstatus (mit kompakter Card-Ansicht fuer mobile Endgeraete).
+
+---
+
+## Projektstruktur
+
+```text
+.
+|-- cv/
+|   |-- tracker.py          # OpenCV Videoanalyse, Zonen-Kollision & Supabase-Sync
+|   `-- requirements.txt    # Python-Abhaengigkeiten (opencv-python, supabase, etc.)
+|-- src/                    # React Frontend (Dashboard, Charts, MediaViewer)
+|-- public/                 # Statische Assets
+`-- README.md
+```
+
+---
+
+## Verwendete Technologien
+
+- **Frontend:** React, TypeScript, Vite, Tailwind CSS
+- **Visualisierung:** Recharts, Lucide React
+- **Backend & Storage:** Supabase (PostgreSQL & Object Storage)
+- **Hosting:** Vercel
+- **Computer Vision:** Python, OpenCV, NumPy
+
+---
+
+## Lizenz
+
+Dieses Projekt ist als Proof of Concept unter der [MIT License](LICENSE) veroeffentlicht.
