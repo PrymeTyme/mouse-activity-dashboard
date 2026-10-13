@@ -71,7 +71,6 @@ export default function App() {
     if (count > maxEvents) {
       maxEvents = count;
       const h = parseInt(hourStr);
-
       peakActivity = `${h.toString().padStart(2, "0")}:00 Uhr`;
     }
   }
@@ -114,9 +113,18 @@ export default function App() {
     },
   ].filter((item) => item.value > 0);
 
+  // --- Medien-URLs über Supabase Storage ---
   const baseName = selectedVideo.split(".")[0];
-  const videoSrc = `/tracked_${baseName}.mp4`;
-  const heatmapSrc = `/heatmap_${baseName}.jpg`;
+
+  // Liest Supabase-URL aus Vite-Env (mit Fallback auf Next.js-Präfix von Vercel-Integration)
+  const supabaseUrl =
+    import.meta.env.VITE_SUPABASE_URL ||
+    import.meta.env.NEXT_PUBLIC_SUPABASE_URL ||
+    "";
+
+  const bucketName = "pest-media";
+  const videoSrc = `${supabaseUrl}/storage/v1/object/public/${bucketName}/tracked_${baseName}.mp4`;
+  const heatmapSrc = `${supabaseUrl}/storage/v1/object/public/${bucketName}/heatmap_${baseName}.jpg`;
 
   return (
     <div
